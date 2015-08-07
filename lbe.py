@@ -73,17 +73,39 @@ class Xcoind(object):
         self._cache.set(cachekey, blocks)
         return blocks
 
+    def gettx(self, tx_hash):
+        raw = self.rpc('getrawtransaction', tx_hash)
+        return self.rpc('decoderawtransaction', raw)
+
+    def gettxs(self, tx_hashes):
+        cachekey = 'gettxs__%s' % str(tx_hashes)
+        txs = self._cache.get(cachekey)
+        if txs:
+            return txs
+
+        txs = []
+        for tx_hash in tx_hashes:
+            tx = self.gettx(tx_hash)
+            txs.append(tx)
+
+        self._cache.set(cachekey, txs)
+        return txs
+
 xcoind = Xcoind(args.XCOIND_HOST, args.XCOIND_PORT, args.XCOIND_USER, args.XCOIND_PASSWORD)
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
     blocks = xcoind.getlastnblocks(100)
-
     return render_template('index.html', blocks=blocks)
 
 
+@app.route('/block/<hash>')
+def block(hash):
+    block = xcoind.getblock(hash)
+    return render_template('block.html', block=block)
 
 if __name__ == '__main__':
     app.debug = True

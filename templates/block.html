@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Block ({{ block.height }}) {{ block.hash }}</h1>
+<table>
+    <tr>
+        <th>height</th>
+        <td>{{ block.height }}</td>
+    </tr>
+    <tr>
+        <th>hash</th>
+        <td>{{ block.hash }}</td>
+    </tr>
+    <tr>
+        <th>previsous block hash</th>
+        <td><a href="/block/{{ block.previousblockhash }}">{{ block.previousblockhash }}</a></td>
+    </tr>
+    <tr>
+        <th>next block hash</th>
+        <td><a href="/block/{{ block.nextblockhash }}">{{ block.nextblockhash }}</a></td>
+    </tr>
+    <tr>
+        <th>time</th>
+        <td>{{ block.time }}</td>
+    </tr>
+    <tr>
+        <th>num tx</th>
+        <td>{{ block.tx|length }}</td>
+    </tr>
+    <tr>
+        <th>confirmations</th>
+        <td>{{ block.confirmations }}</td>
+    </tr>
+    <tr>
+        <th>size</th>
+        <td>{{ block.size }}</td>
+    </tr>
+    <tr>
+        <th>version</th>
+        <td>{{ block.version }}</td>
+    </tr>
+</table>
+<h3>Transactions</h3>
+
+<table>
+    <tr>
+        <th>hash</th>
+    </tr>
+{% for tx_hash in block.tx %}
+    <tr>
+        <td><a href="/tx/{{ tx_hash }}">{{ tx_hash }}</a></td>
+    </tr>
+{% endfor %}
+</table>
+{% endblock content %}
