@@ -91,6 +91,34 @@ class Xcoind(object):
         self._cache.set(cachekey, txs)
         return txs
 
+    def getsimpletx(self, txid):
+        tx = self.gettx(txid)
+        is_coinbase = True if 'coinbase' in tx['vin'][0] else False
+        vins = []
+        if not is_coinbase:
+            for vin in tx['vin']:
+                in_tx = self.gettx(vin['txid'])
+                for in_vout in in_tx['vout']:
+                    if vin['vout'] == in_vout['n']:
+                        vins.append({
+                            'address': in_vout['scriptPubKey']['addresses'][0] if 'addresses' in in_vout['scriptPubKey'] else None,
+                            'value': in_vout['value'],
+                        })
+
+        vouts = []
+        for vout in tx['vout']:
+            vouts.append({
+                'address': vout['scriptPubKey']['addresses'][0] if 'addresses' in vout['scriptPubKey'] else None,
+                'value': vout['value'],
+            })
+        return {
+            'txid': txid,
+            'is_coinbase': is_coinbase,
+            'vin': vins,
+            'vout': vouts,
+            'tx': tx,
+        }
+
 xcoind = Xcoind(args.XCOIND_HOST, args.XCOIND_PORT, args.XCOIND_USER, args.XCOIND_PASSWORD)
 
 app = Flask(__name__)
@@ -106,6 +134,11 @@ def index():
 def block(hash):
     block = xcoind.getblock(hash)
     return render_template('block.html', block=block)
+
+@app.route('/tx/<hash>')
+def tx(hash):
+    tx = xcoind.getsimpletx(hash)
+    return render_template('tx.html', tx=tx)
 
 if __name__ == '__main__':
     app.debug = True
