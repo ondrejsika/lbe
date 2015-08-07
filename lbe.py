@@ -5,7 +5,7 @@
 import argparse
 
 from flask import Flask, render_template
-from jsonrpc_requests import Server
+from jsonrpc_requests import Server, TransportError, ProtocolError
 
 
 parser = argparse.ArgumentParser('LBE - Light Blockchain Explorer')
@@ -126,18 +126,29 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    blocks = xcoind.getlastnblocks(100)
+    try:
+        blocks = xcoind.getlastnblocks(100)
+    except (TransportError, ProtocolError):
+        return render_template('error_xcoind.html')
     return render_template('index.html', blocks=blocks)
 
 
 @app.route('/block/<hash>')
 def block(hash):
-    block = xcoind.getblock(hash)
+    try:
+        block = xcoind.getblock(hash)
+    except (TransportError, ProtocolError):
+        return render_template('error_xcoind.html')
+
     return render_template('block.html', block=block)
 
 @app.route('/tx/<hash>')
 def tx(hash):
-    tx = xcoind.getsimpletx(hash)
+    try:
+        tx = xcoind.getsimpletx(hash)
+    except (TransportError, ProtocolError):
+        return render_template('error_xcoind.html')
+
     return render_template('tx.html', tx=tx)
 
 if __name__ == '__main__':
