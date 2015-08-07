@@ -17,13 +17,17 @@
     </tr>
 </table>
 
+{% if tx.is_coinbase %}
+    <p>This is a coinbase transaction.</p>
+{% endif %}
+
 <table>
     <tr>
-        <th>Inputs</th>
+        {% if not tx.is_coinbase %}<th>Inputs</th>{% endif %}
         <th>Outputs</th>
     </tr>
     <tr valign="top">
-        <td>
+        {% if not tx.is_coinbase %}<td>
             <table>
                 <tr>
                     <th>address</th>
@@ -36,7 +40,7 @@
                 </tr>
                 {% endfor %}
             </table>
-        </td>
+        </td>{% endif %}
         <td>
             <table>
                 <tr>

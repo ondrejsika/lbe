@@ -9,11 +9,14 @@ from jsonrpc_requests import Server, TransportError, ProtocolError
 
 
 parser = argparse.ArgumentParser('LBE - Light Blockchain Explorer')
+parser.add_argument('HOST', type=str)
 parser.add_argument('PORT', type=int)
 parser.add_argument('XCOIND_HOST', type=str)
 parser.add_argument('XCOIND_PORT', type=int)
 parser.add_argument('XCOIND_USER', type=str)
 parser.add_argument('XCOIND_PASSWORD', type=str)
+parser.add_argument('--coin', type=str, default='')
+parser.add_argument('--debug', type=str, default=False)
 
 args = parser.parse_args()
 
@@ -122,36 +125,39 @@ class Xcoind(object):
 xcoind = Xcoind(args.XCOIND_HOST, args.XCOIND_PORT, args.XCOIND_USER, args.XCOIND_PASSWORD)
 
 app = Flask(__name__)
+app.debug = args.debug
 
 
 @app.route('/')
 def index():
     try:
         blocks = xcoind.getlastnblocks(100)
-    except (TransportError, ProtocolError):
-        return render_template('error_xcoind.html')
-    return render_template('index.html', blocks=blocks)
+    except (TransportError, ProtocolError), e:
+        print e
+        return render_template('error_xcoind.html', coin=args.coin)
+    return render_template('index.html', blocks=blocks, coin=args.coin)
 
 
 @app.route('/block/<hash>')
 def block(hash):
     try:
         block = xcoind.getblock(hash)
-    except (TransportError, ProtocolError):
-        return render_template('error_xcoind.html')
+    except (TransportError, ProtocolError), e:
+        print e
+        return render_template('error_xcoind.html', coin=args.coin)
 
-    return render_template('block.html', block=block)
+    return render_template('block.html', block=block, coin=args.coin)
 
 @app.route('/tx/<hash>')
 def tx(hash):
     try:
         tx = xcoind.getsimpletx(hash)
-    except (TransportError, ProtocolError):
-        return render_template('error_xcoind.html')
+    except (TransportError, ProtocolError), e:
+        print e
+        return render_template('error_xcoind.html', coin=args.coin)
 
-    return render_template('tx.html', tx=tx)
+    return render_template('tx.html', tx=tx, coin=args.coin)
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run()
+    app.run(host=args.HOST, port=args.PORT)
 
