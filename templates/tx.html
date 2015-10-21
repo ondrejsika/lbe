@@ -19,6 +19,16 @@
 
 {% if tx.is_coinbase %}
     <p>This is a coinbase transaction.</p>
+    <table>
+        <tr>
+            <th>coinbase</th>
+            <td>{{ tx.coinbase }}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <td>{{ tx.coinbase_text }}</td>
+        </tr>
+    </table>
 {% endif %}
 
 <table>

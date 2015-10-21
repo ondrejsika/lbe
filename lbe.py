@@ -3,6 +3,7 @@
 # License: MIT <http://ondrejsika.com/license/mit.txt>
 
 import argparse
+import binascii
 
 from flask import Flask, render_template
 from jsonrpc_requests import Server, TransportError, ProtocolError
@@ -96,9 +97,13 @@ class Xcoind(object):
 
     def getsimpletx(self, txid):
         tx = self.gettx(txid)
-        is_coinbase = True if 'coinbase' in tx['vin'][0] else False
         vins = []
-        if not is_coinbase:
+        if 'coinbase' in tx['vin'][0]:
+            coinbase = tx['vin'][0]['coinbase']
+            coinbase_text = binascii.unhexlify(coinbase)
+        else:
+            coinbase = None
+            coinbase_text = None
             for vin in tx['vin']:
                 in_tx = self.gettx(vin['txid'])
                 for in_vout in in_tx['vout']:
@@ -116,7 +121,9 @@ class Xcoind(object):
             })
         return {
             'txid': txid,
-            'is_coinbase': is_coinbase,
+            'is_coinbase': bool(coinbase),
+            'coinbase': coinbase,
+            'coinbase_text': coinbase_text,
             'vin': vins,
             'vout': vouts,
             'tx': tx,
@@ -142,11 +149,12 @@ def index():
 def block(hash):
     try:
         block = xcoind.getblock(hash)
+        coinbase = xcoind.getsimpletx(block['tx'][0])
     except (TransportError, ProtocolError), e:
         print e
         return render_template('error_xcoind.html', coin=args.coin)
 
-    return render_template('block.html', block=block, coin=args.coin)
+    return render_template('block.html', block=block, coinbase=coinbase, coin=args.coin)
 
 @app.route('/tx/<hash>')
 def tx(hash):
