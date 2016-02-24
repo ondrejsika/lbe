@@ -6,6 +6,7 @@
         <th>height</th>
         <th>hash</th>
         <th>time</th>
+        <th>formated</th>
         <th>num tx</th>
         <th>confirmations</th>
         <th>size</th>
@@ -16,6 +17,7 @@
     <td>{{ block.height }}</td>
     <td><a href="/block/{{ block.hash }}">{{ block.hash }}</a></td>
     <td>{{ block.time }}</td>
+    <td>{{ block.time|formated_time }}</td>
     <td>{{ block.tx|length }}</td>
     <td>{{ block.confirmations }}</td>
     <td>{{ block.size }}</td>

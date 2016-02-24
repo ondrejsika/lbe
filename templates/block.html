@@ -23,6 +23,10 @@
         <td>{{ block.time }}</td>
     </tr>
     <tr>
+        <th>formated</th>
+        <td>{{ block.time|formated_time }}</td>
+    </tr>
+    <tr>
         <th>num tx</th>
         <td>{{ block.tx|length }}</td>
     </tr>

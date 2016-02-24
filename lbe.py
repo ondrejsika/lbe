@@ -4,6 +4,7 @@
 
 import argparse
 import binascii
+import datetime
 
 from flask import Flask, render_template
 from jsonrpc_requests import Server, TransportError, ProtocolError
@@ -133,6 +134,11 @@ xcoind = Xcoind(args.XCOIND_HOST, args.XCOIND_PORT, args.XCOIND_USER, args.XCOIN
 
 app = Flask(__name__)
 app.debug = args.debug
+
+
+@app.template_filter('formated_time')
+def timectime(s):
+    return datetime.datetime.fromtimestamp(s).strftime('%y-%m-%d %H:%M:%S')
 
 
 @app.route('/')
