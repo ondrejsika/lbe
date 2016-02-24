@@ -109,7 +109,7 @@ class Xcoind(object):
         vins = []
         if 'coinbase' in tx['vin'][0]:
             coinbase = tx['vin'][0]['coinbase']
-            coinbase_text = binascii.unhexlify(coinbase)
+            coinbase_text = ''.join([i if ord(i) < 128 else '.' for i in binascii.unhexlify(coinbase)])
         else:
             coinbase = None
             coinbase_text = None
