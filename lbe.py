@@ -1,3 +1,4 @@
+# coding: utf8
 # LBE - Lite Block Explorer
 # Author: Ondrej Sika <ondrej@ondrejsika.com>
 # License: MIT <http://ondrejsika.com/license/mit.txt>
@@ -22,6 +23,13 @@ parser.add_argument('--debug', action='store_true')
 
 args = parser.parse_args()
 
+
+class DummyCache(object):
+    def set(self, key, val):
+        pass
+
+    def get(self, key):
+        return None
 
 class LocalCache(object):
     _storage = None
@@ -130,7 +138,7 @@ class Xcoind(object):
             'tx': tx,
         }
 
-xcoind = Xcoind(args.XCOIND_HOST, args.XCOIND_PORT, args.XCOIND_USER, args.XCOIND_PASSWORD)
+xcoind = Xcoind(args.XCOIND_HOST, args.XCOIND_PORT, args.XCOIND_USER, args.XCOIND_PASSWORD, cache=DummyCache())
 
 app = Flask(__name__)
 app.debug = args.debug
