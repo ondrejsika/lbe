@@ -11,6 +11,8 @@
         <th>confirmations</th>
         <th>size</th>
         <th>version</th>
+        <th>difficulty</th>
+        <th>bits</th>
     </tr>
 {% for block in blocks %}
 <tr>
@@ -22,6 +24,8 @@
     <td>{{ block.confirmations }}</td>
     <td>{{ block.size }}</td>
     <td>{{ block.version }}</td>
+    <td>{{ block.difficulty }}</td>
+    <td>{{ block.bits }}</td>
 </tr>
 {% endfor %}
 </table>
