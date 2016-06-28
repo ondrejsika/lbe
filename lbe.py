@@ -65,7 +65,10 @@ class Xcoind(object):
         return self.rpc('getbestblockhash')
 
     def getblock(self, hash):
-        return self.rpc('getblock', hash, True)
+        block = self.rpc('getblock', hash, True)
+        block['version_hex'] = hex(block['version'])
+        block['version_bin'] = bin(block['version'])
+        return block
 
     def getlastnblocks(self, limit):
         lastblockhash = self.getbestblockhash()
