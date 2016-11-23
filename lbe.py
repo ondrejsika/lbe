@@ -19,6 +19,7 @@ parser.add_argument('XCOIND_PORT', type=int)
 parser.add_argument('XCOIND_USER', type=str)
 parser.add_argument('XCOIND_PASSWORD', type=str)
 parser.add_argument('--coin', type=str, default='')
+parser.add_argument('--n-last-blocks', type=int, default=100)
 parser.add_argument('--debug', action='store_true')
 
 args = parser.parse_args()
@@ -164,7 +165,7 @@ def timectime(s):
 @app.route('/')
 def index():
     try:
-        blocks = xcoind.getlastnblocks(100)
+        blocks = xcoind.getlastnblocks(args.n_last_blocks)
     except (TransportError, ProtocolError), e:
         print e
         return render_template('error_xcoind.html', coin=args.coin)
