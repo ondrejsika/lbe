@@ -117,13 +117,22 @@ class Xcoind(object):
             coinbase = None
             coinbase_text = None
             for vin in tx['vin']:
-                in_tx = self.gettx(vin['txid'])
-                for in_vout in in_tx['vout']:
-                    if vin['vout'] == in_vout['n']:
-                        vins.append({
-                            'address': in_vout['scriptPubKey']['addresses'][0] if 'addresses' in in_vout['scriptPubKey'] else None,
-                            'value': in_vout['value'],
-                        })
+                try:
+                    in_tx = self.gettx(vin['txid'])
+                except (TransportError, ProtocolError), e:
+                    in_tx = None
+                if in_tx:
+                    for in_vout in in_tx['vout']:
+                        if vin['vout'] == in_vout['n']:
+                            vins.append({
+                                'address': in_vout['scriptPubKey']['addresses'][0] if 'addresses' in in_vout['scriptPubKey'] else None,
+                                'value': in_vout['value'],
+                            })
+                else:
+                    vins.append({
+                        'address': '???',
+                        'value': '???',
+                    })
 
         vouts = []
         for vout in tx['vout']:
