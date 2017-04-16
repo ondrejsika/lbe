@@ -24,6 +24,12 @@ parser.add_argument('--debug', action='store_true')
 
 args = parser.parse_args()
 
+from datetime import tzinfo, timedelta
+class simple_utc(tzinfo):
+    def tzname(self):
+        return "UTC"
+    def utcoffset(self, dt):
+        return timedelta(0)
 
 class DummyCache(object):
     def set(self, key, val):
@@ -156,10 +162,13 @@ xcoind = Xcoind(args.XCOIND_HOST, args.XCOIND_PORT, args.XCOIND_USER, args.XCOIN
 app = Flask(__name__)
 app.debug = args.debug
 
+@app.template_filter('iso_time')
+def timeisotime(s):
+    return datetime.datetime.utcfromtimestamp(s).replace(tzinfo=simple_utc()).isoformat()
 
 @app.template_filter('formated_time')
 def timectime(s):
-    return datetime.datetime.fromtimestamp(s).strftime('%y-%m-%d %H:%M:%S')
+    return datetime.datetime.utcfromtimestamp(s).replace(tzinfo=simple_utc())
 
 
 @app.route('/')
