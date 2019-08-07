@@ -1,3 +1,3 @@
-Flask==0.10.1
+flask>=1.0.0
 jsonrpc-requests==0.2
 
